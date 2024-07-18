@@ -37,20 +37,38 @@ This Flask application defines a simple web server with two endpoints. The /home
 
 #### Testing Procedure:
 
-- Start the server container: `docker-compose up server`
-- Send HTTP GET requests to `/home` and `/heartbeat` endpoints:
--- `curl localhost:5000/home`
--- `curl localhost:5000/heartbeat`
- - Verify that the server returns the expected responses.
+- Create the Docker Image : `docker build -t simple-server .`
+
+  ![image](https://github.com/user-attachments/assets/d9de6bb3-a917-468f-99bf-6e805156f845)
+  
+- Run the Docker  ` docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server`
+
+![image](https://github.com/user-attachments/assets/30142404-db07-44ef-b54d-f8b467bd6e8a)
+
+
+![image](https://github.com/user-attachments/assets/c25559a6-1555-409a-ba1f-082936e83929)
+
+- Test tha the End Points are working: `http://localhost:5000/home` in the browser.
+![image](https://github.com/user-attachments/assets/1be52dc1-422f-400f-8c9e-302e6796ea40)
+
 
 ### Task 2: Consistent Hashing
 The ConsistentHashing class implements a consistent hashing mechanism to distribute requests across multiple virtual server instances. The constructor initializes the class with the number of servers (N), number of slots (slots), and number of virtual nodes per server (K). The init_server_map method populates the server_map with virtual servers mapped to slots using a simple hash function. The get_server method determines the appropriate server for a given request by hashing the request ID and finding the corresponding slot in the server map, ensuring efficient and balanced request distribution.
 
 #### Testing Procedure:
 
-- Implement the consistent hash map data structure.
-- Generate a set of client requests and map them to server instances using the consistent hash algorithm.
-- Verify that the requests are evenly distributed among server instances.
+- Create 3 docker containers(server) by using this: `docker-compose up --scale server=3`
+
+  ![image](https://github.com/user-attachments/assets/506102f5-fc3a-4453-9209-6bd183265eda)
+
+- Confirm that the endpoint are being directed to diferent server by running `http://localhost:5000/home`. The message shows from what server the request is coming from.
+  
+![image](https://github.com/user-attachments/assets/08c9305a-dcad-41f6-9430-1a9c00555a8e)
+
+-Confirm in the Docker App
+
+![image](https://github.com/user-attachments/assets/fe5d6575-f9e3-4672-933f-5af443c3ed53)
+
   
 ### Task 3: Load Balancer
 This Flask-based load balancer uses consistent hashing to distribute incoming requests across multiple server instances. It includes endpoints to view current replicas (/rep), add new servers (/add), remove servers (/rm), and route requests to the appropriate server (/). The consistent hashing ensures efficient and balanced distribution of the load among server instances.
@@ -58,41 +76,62 @@ This Flask-based load balancer uses consistent hashing to distribute incoming re
 
 #### Testing Procedure:
 
-- Build and deploy the load balancer container: `docker-compose up load_balancer`
+- Build and deploy the load balancer container: `docker-compose build `
+  
+![image](https://github.com/user-attachments/assets/1cfbe450-fd70-448c-84e4-e53db527b04b)
+
+- Restart the Container: `docker-compose up`
+
+![image](https://github.com/user-attachments/assets/b2d13444-b459-4b3e-9591-28f0f9288e69)
+
+![image](https://github.com/user-attachments/assets/d9536ddb-572e-4aff-b9b2-f0803103b58f)
+
 - Send HTTP requests to load balancer endpoints (/rep, /add, /rm, etc.): `curl localhost:5000/rep and curl -X POST -d '{"n": 2, "hostnames": ["S5", "S4"]}' localhost:5000/add`
-- Verify that the load balancer routes requests to server replicas as expected.
-- Test load balancing under varying load conditions.
+- 
+- This is a sample of `curl localhost:5000/rep` and verify that the load balancer routes requests to server replicas as expected.
+
+ ![image](https://github.com/user-attachments/assets/ced26660-d647-47c9-86ae-4be1b71f1408)
+
+ - Add a more servers: 4 and 5. ` curl -X POST -d '{"n": 2, "hostnames": ["S5", "S4"]}' localhost:5000/add` OR `$headers = @{"Content-Type" = "application/json"} $data = '{"n": 2, "hostnames": ["Server 4", "Server 5"]}' `Invoke-WebRequest -Uri http://localhost:5000/add -Method POST -Headers $headers -Body $data`
+   
+ ![image](https://github.com/user-attachments/assets/c3c0c4e3-061c-4d6d-b414-4b415eb7c38a)
+
+- To remove server 5 use `curl -X POST -d '{"n": 2, "hostnames": ["S5"]}` OR' localhost:5000/rm `$headers = @{"Content-Type" = "application/json"}  $data = '{"n": 1, "hostnames": ["Server 5"]}` `Invoke-WebRequest -Uri http://localhost:5000/rm -Method DELETE -Headers $headers -Body $data`
+
+![image](https://github.com/user-attachments/assets/6b4a256c-17ba-4fa7-a571-f4c6012dc7fe)
+
+
   
 ### Task 4: Analysis
 Task 4 involves testing and analyzing the performance of the load balancer implementation in various scenarios. We conduct experiments to evaluate load distribution among server containers and the system's ability to recover from server failures promptly.
 
 #### Testing Procedure:
-- Launch the server `docker-compose up server`
-- Launch the Load Balancer `docker-compose up load_balancer`
-- Launch the application using `python WebServer.py`
-- Launch 10000 asynchronous requests on N = 3 server containers.
-  `asyncio.run()`
-  `docker run -d --name server1 -p 5001:5000 server-image`
-  `docker run -d --name server2 -p 5002:5000 server-image`
-  `docker run -d --name server3 -p 5003:5000 server-image`
-- Increment N from 2 to 6 and launch 10000 requests on each increment.
-  `docker run -d --name server4 -p 5004:5000 server-image`  
-  `curl -X POST -H "Content-Type: application/json" -d '{"n": 1, "hostnames": ["server4"]}' http://localhost:5000/add`
+- First build up the docker containers again ` docker-compose build`
 
-- Test all endpoints of the load balancer and verify the system's behavior in case of server failure.
-  `curl http://localhost:5000/rep`
-  `curl -X POST -H "Content-Type: application/json" -d '{"n": 1, "hostnames": ["serverX"]}' http://localhost:5000/add`
-  `curl -X DELETE -H "Content-Type: application/json" -d '{"n": 1, "hostnames": ["serverY"]}' http://localhost:5000/rm`
+![image](https://github.com/user-attachments/assets/76a7e8e0-e704-4970-a1c1-608f6dd936d6)
 
-- Simulate server failures
-  `docker stop server1`
+##### A-1: Launch 10,000 Asynchronous Requests on 3 Server Containers
+- Run the test_script.py
 
-- Analyze the behaviour then cleanup by removing the servers.
- `docker stop server1 server2 server3 server4 server5 server6`
- `docker rm server1 server2 server3 server4 server5 server6`
+![image](https://github.com/user-attachments/assets/2cebb1b6-23a0-40a2-ae11-f088eac84923)
 
+##### A-2: Launch 10,000 Asynchronous Requests on 6 Server Containers
+- Run the test_script.py after increasing the number of servers to 6
 
-By following these steps, you can comprehensively test the performance and robustness of your load balancer implementation in various scenarios.
+![image](https://github.com/user-attachments/assets/c38f550c-80b8-4ef4-b2e3-7fd7dd0b2701)
+
+##### A-3 Test all endpoints of the load balancer 
+- Stop the server first using `docker stop <SERVER_ID>`. Any server. Example: `docker stop Server 1`
+
+- Run the test_script.py again.
+
+![image](https://github.com/user-attachments/assets/5b49a58c-af90-4c97-896e-70559347921e)
+
+- The requests which were on server 1 were redestributed to the rest of the servers but it took roughly 5 minutes to adjust.
+
+##### A-4: Modify Hash Functions
+
+After modifying the hash functions used in our load balancer, we observed significant changes in how requests were distributed among server instances. The adjustments led to a noticeable shift in load balancing effectiveness, with some servers handling more requests than previously, while others received fewer. This variability directly impacted the overall efficiency of our load balancer in evenly distributing the workload across all servers. The quality of the new hash functions played a crucial role here: well-designed functions helped maintain stable performance even when servers were added or removed, whereas less effective functions struggled to balance the load consistently. These observations underscore the importance of choosing and refining hash functions carefully to optimize load balancing efficiency and maintain system stability under varying operational conditions.  
 
 
 ### Deployment Instruction
