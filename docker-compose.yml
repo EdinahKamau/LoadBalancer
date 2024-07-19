@@ -1,20 +1,34 @@
-version: "3.9"
+version: "3.8"
+
 services:
-  load-balancer:
-    build: .
+  load_balancer:
+    build:
+      context: .
+      dockerfile: Dockerfile.load_balancer
     ports:
       - "5000:5000"
-    environment:
-      FLASK_ENV: development
-    volumes:
-      - .:/app
     depends_on:
-      - server
-  server:
-    build: .
-    ports:
-      - "5001:5001"
+      - server1
+      - server2
+      - server3
+
+  server1:
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      FLASK_ENV: production
-    volumes:
-      - .:/app
+      - SERVER_ID=Server 1
+
+  server2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_ID=Server 2
+
+  server3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_ID=Server 3
