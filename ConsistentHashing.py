@@ -1,67 +1,64 @@
-class ConsistentHashing:
-    def __init__(self, N, slots, K):
-        """
-        Initialize the ConsistentHashing instance.
-        
-        Args:
-        N (int): Number of servers.
-        slots (int): Number of slots in the hash space.
-        K (int): Number of virtual nodes per server.
-        """
-        self.N = N
-        self.slots = slots
-        self.K = K
-        self.server_map = {}
-        self.init_server_map()  # Initialize the server map with virtual nodes
 
-    def init_server_map(self):
-        """
-        Populate the server_map with virtual nodes for each server.
-        """
-        for i in range(self.N):
-            for j in range(self.K):
-                # Create a unique identifier for each virtual server node
-                virtual_server = f"Server_{i}_{j}"
-                # Determine the slot for this virtual server using the hash function
-                slot = self.hash_function(i + j + 2 * j + 25) % self.slots
-                # Map the slot to the virtual server in the server_map
-                self.server_map[slot] = virtual_server
+import hashlib
+import bisect
 
-    def hash_function(self, value):
-        """
-        Hash function to map a value to a slot in the hash space.
-        
-        Args:
-        value (int): Value to be hashed.
-        
-        Returns:
-        int: Hashed value.
-        """
-        return value
 
-    def get_server(self, request_id):
-        """
-        Get the server for a given request based on the request ID.
-        
-        Args:
-        request_id (int): Unique identifier for the request.
-        
-        Returns:
-        str: The virtual server responsible for handling the request.
-        """
-        # Compute the initial slot for the request using the hash function
-        slot = self.hash_function(request_id) % self.slots
-        # Find the closest slot that has a server mapped to it
-        while slot not in self.server_map:
-            slot = (slot + 1) % self.slots  # Linear probing to find the next available slot
-        return self.server_map[slot]  # Return the virtual server mapped to the slot
+class ConsistentHashMap:
+    def _init_(self, num_slots, num_servers, num_virtual_servers):
+        self.num_slots = num_slots
+        self.num_servers = num_servers
+        self.num_virtual_servers = num_virtual_servers
+        self.slot_to_server = {}
+        self.sorted_slots = []
+
+    def add_server(self, server_id):
+        virtual_servers = [f"{server_id}-v{v}" for v in range(self.num_virtual_servers)]
+        for virtual_server in virtual_servers:
+            slot = self._hash_function(virtual_server) % self.num_slots
+            self.slot_to_server[slot] = virtual_server
+            self.sorted_slots.append(slot)
+        self.sorted_slots.sort()
+
+    def remove_server(self, server_id):
+        virtual_servers = [f"{server_id}-v{v}" for v in range(self.num_virtual_servers)]
+        for virtual_server in virtual_servers:
+            slot = self._hash_function(virtual_server) % self.num_slots
+            del self.slot_to_server[slot]
+            self.sorted_slots.remove(slot)
+
+    def get_server(self, key):
+        hashed_key = self._hash_function(key)
+        idx = bisect.bisect_right(self.sorted_slots, hashed_key % self.num_slots)
+        if idx == len(self.sorted_slots):
+            return self.slot_to_server[self.sorted_slots[0]]
+        else:
+            return self.slot_to_server[self.sorted_slots[idx]]
+
+    def _hash_function(self, key):
+        return int(hashlib.md5(key.encode()).hexdigest(), 16)
+
 
 # Example usage
-if __name__ == "__main__":
-    # Initialize with 3 servers, 512 slots, and 9 virtual nodes per server
-    ch = ConsistentHashing(N=3, slots=512, K=9)
+if _name_ == "_main_":
+    num_slots = 512
+    num_servers = 3
+    num_virtual_servers = 9
 
-    # Get the server for a specific request ID
-    request_id = 123
-    server = ch.get_server(request_id)
-    print(f"Request ID {request_id} is routed to {server}")
+    consistent_hash_map = ConsistentHashMap(num_slots, num_servers, num_virtual_servers)
+
+    # Adding servers
+    for i in range(1, num_servers + 1):
+        consistent_hash_map.add_server(f"S{i}")
+
+    # Testing the hash map with some keys
+    keys = ["key1", "key2", "key3", "key4", "key5"]
+    for key in keys:
+        server = consistent_hash_map.get_server(key)
+        print(f"Key: {key} -> Server: {server}")
+
+    # Removing a server
+    consistent_hash_map.remove_server("S1")
+    print("\nAfter removing S1:")
+    for key in keys:
+        server = consistent_hash_map.get_server(key)
+        print(f"Key: {key} -> Server: {server}")
