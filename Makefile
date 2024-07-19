@@ -1,21 +1,38 @@
-.PHONY: all run clean test
+# Variables
+DOCKER_COMPOSE = docker-compose
+DOCKER = docker
+SERVER_DIR = ./LoadBalancer
+LOAD_BALANCER_DIR = ./LoadBalancer
+SERVER_IMAGE = simple-server
+LOAD_BALANCER_IMAGE = load-balancer
+CONTAINER_NAME = load-balancer
 
-# Define the default target
-all: build
+# Targets
+all: build up
 
-# Define the target to build the Docker images
 build:
-	docker-compose up 
+	@echo "Building Docker images..."
+	$(DOCKER) build -t $(SERVER_IMAGE) $(SERVER_DIR)
+	$(DOCKER) build -t $(LOAD_BALANCER_IMAGE) $(LOAD_BALANCER_DIR)
 
-# Define the target to run the Docker containers
-run:
-	docker-compose up --build
+up:
+	@echo "Starting containers..."
+	$(DOCKER_COMPOSE) up -d
 
-# Define the target to clean up Docker resources
+down:
+	@echo "Stopping containers..."
+	$(DOCKER_COMPOSE) down
+
+logs:
+	@echo "Viewing logs..."
+	$(DOCKER_COMPOSE) logs -f
+
 clean:
-	docker-compose down
+	@echo "Removing containers and images..."
+	$(DOCKER_COMPOSE) down --rmi all --volumes --remove-orphans
 
-# Define a target to run the tests
-test:
-	# Add commands to run your tests here
-      pytest tests/
+# adding servers
+add-server:
+	@echo "Adding server..."
+	$(DOCKER_COMPOSE) up --scale server=3
+
