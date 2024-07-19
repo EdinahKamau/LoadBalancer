@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy requirements and app code
 COPY requirements.txt .
-COPY server.py .
+COPY WebServer.py .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -18,4 +18,4 @@ ENV SERVER_ID="1"
 EXPOSE 5000
 
 # Command to run the server
-CMD ["python", "server.py"]
+CMD ["python", "WebServer.py"]
