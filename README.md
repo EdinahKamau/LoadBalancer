@@ -111,19 +111,19 @@ Task 4 involves testing and analyzing the performance of the load balancer imple
 ![image](https://github.com/user-attachments/assets/76a7e8e0-e704-4970-a1c1-608f6dd936d6)
 
 ##### A-1: Launch 10,000 Asynchronous Requests on 3 Server Containers
-- Run the test_script.py
+- Run the test_script1.py
 
 ![image](https://github.com/user-attachments/assets/2cebb1b6-23a0-40a2-ae11-f088eac84923)
 
 ##### A-2: Launch 10,000 Asynchronous Requests on 6 Server Containers
-- Run the test_script.py after increasing the number of servers to 6
+- Run the test_script2.py after increasing the number of servers to 6
 
 ![image](https://github.com/user-attachments/assets/c38f550c-80b8-4ef4-b2e3-7fd7dd0b2701)
 
 ##### A-3 Test all endpoints of the load balancer 
 - Stop the server first using `docker stop <SERVER_ID>`. Any server. Example: `docker stop Server 1`
 
-- Run the test_script.py again.
+- Run the test_script2.py again.
 
 ![image](https://github.com/user-attachments/assets/5b49a58c-af90-4c97-896e-70559347921e)
 
