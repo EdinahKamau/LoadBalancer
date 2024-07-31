@@ -8,27 +8,12 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - server1
-      - server2
-      - server3
+      - server
 
-  server1:
+  server:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      - SERVER_ID=Server 1
+      - SERVER_ID=Server
 
-  server2:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      - SERVER_ID=Server 2
-
-  server3:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      - SERVER_ID=Server 3

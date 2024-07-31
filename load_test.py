@@ -6,7 +6,11 @@ from collections import Counter
 
 async def fetch(session, url):
     async with session.get(url) as response:
-        return await response.json()
+        try:
+            data = await response.json()
+            return data
+        except aiohttp.ContentTypeError:
+            return {"server": "unknown"}
 
 async def main():
     url = "http://localhost:5000/home"
@@ -30,7 +34,7 @@ async def main():
     plt.title('Request Distribution Among Servers')
     plt.show()
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     start_time = time.time()
     asyncio.run(main())
-    print(f"Completed in {time.time() - start_time} seconds")
+    print(f"Completed in {time.time() - start_time} seconds")

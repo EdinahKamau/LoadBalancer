@@ -1,0 +1,55 @@
+BUILD THE DOCKER IMAGE -  `docker build -t simple-server .`
+
+TO VIEW THE IMAGES  -  `docker images`
+
+RUN THE DOCKER CONTAINER  -  `docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server`
+
+CONFIRM ITS RUNNING - `docker ps`
+
+TEST THE END POINT - `http://localhost:5000/home`
+
+
+TASK 2: CONSISTENT HASHING
+
+BUILD UP 3 CONTAINERS FOR THE SERVER  `docker-compose up --scale server=3`
+
+CONFIRM ITS RUNNING - `docker-compose ps`
+
+TESTING ON BROWSER: `http://172.27.0.5:5000/rep`
+
+
+
+TASK 3 LOAD BALANCER
+
+TEST ADD ON TERMINAL curl -X POST -H "Content-Type: application/json" -d '{"n": 2, "hostnames": ["S5", "S4"]}' http://172.27.0.5:5000/add
+
+TO DELETE `curl -X DELETE -H "Content-Type: application/json" -d '{"n": 2, "hostnames": ["S5"]}' http://172.27.0.5:5000/rm
+
+TASK 3:ANALYSIS
+
+
+
+
+
+
+
+
+
+
+
+
+VIEW THE LOGS AND DOCKER COMPOSE
+
+docker-compose logs server
+docker-compose logs load_balancer
+docker-compose down
+docker-compose up --build --scale server=3
+TO REMOVE THE IMAGE - docker rmi simple-server
+RUN THE DOCKER CONTAINER  -  docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server
+TO REMOVE THE DOCKER CONTAINER - docker rm simple-server-instance
+TO STOP THE CONTAINNER - docker stop simple-server-instance
+TO START THE DOCKER - docker-compose up
+TO REMOVE EVERYHTING docker system prune -a --volumes -f
+STOP AND REMOVE ALL CONTAINERS   docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
+STOP AND REMOVE ALL IMAGES  docker rmi $(docker images -q) --force
+REMOVE ALL VOLUMES   docker volume rm $(docker volume ls -q) --force

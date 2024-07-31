@@ -1,10 +1,11 @@
-
 import hashlib
 import bisect
+from flask import Flask, jsonify
 
+app = Flask(__name__)
 
 class ConsistentHashMap:
-    def _init_(self, num_slots, num_servers, num_virtual_servers):
+    def __init__(self, num_slots, num_servers, num_virtual_servers):
         self.num_slots = num_slots
         self.num_servers = num_servers
         self.num_virtual_servers = num_virtual_servers
@@ -37,28 +38,25 @@ class ConsistentHashMap:
     def _hash_function(self, key):
         return int(hashlib.md5(key.encode()).hexdigest(), 16)
 
+consistent_hash_map = ConsistentHashMap(num_slots=512, num_servers=3, num_virtual_servers=9)
 
-# Example usage
-if _name_ == "_main_":
-    num_slots = 512
-    num_servers = 3
-    num_virtual_servers = 9
+@app.route('/add_server/<server_id>', methods=['POST'])
+def add_server(server_id):
+    consistent_hash_map.add_server(server_id)
+    return jsonify({"message": f"Server {server_id} added"})
 
-    consistent_hash_map = ConsistentHashMap(num_slots, num_servers, num_virtual_servers)
+@app.route('/remove_server/<server_id>', methods=['POST'])
+def remove_server(server_id):
+    consistent_hash_map.remove_server(server_id)
+    return jsonify({"message": f"Server {server_id} removed"})
 
-    # Adding servers
-    for i in range(1, num_servers + 1):
+@app.route('/home', methods=['GET'])
+def home():
+    key = str(time.time())  # Use current time to generate a unique key
+    server = consistent_hash_map.get_server(key)
+    return jsonify({"server": server})
+
+if __name__ == '__main__':
+    for i in range(1, 4):  # Example initial servers
         consistent_hash_map.add_server(f"S{i}")
-
-    # Testing the hash map with some keys
-    keys = ["key1", "key2", "key3", "key4", "key5"]
-    for key in keys:
-        server = consistent_hash_map.get_server(key)
-        print(f"Key: {key} -> Server: {server}")
-
-    # Removing a server
-    consistent_hash_map.remove_server("S1")
-    print("\nAfter removing S1:")
-    for key in keys:
-        server = consistent_hash_map.get_server(key)
-        print(f"Key: {key} -> Server: {server}")
+    app.run(host='0.0.0.0', port=5000)

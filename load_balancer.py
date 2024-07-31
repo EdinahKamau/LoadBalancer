@@ -3,7 +3,7 @@ import requests
 import random
 import string
 
-app = Flask(_name_)
+app = Flask(__name__)
 servers = ["Server 1", "Server 2", "Server 3"]
 
 @app.route('/rep', methods=['GET'])
@@ -67,5 +67,5 @@ def route_request(path):
     response = requests.get(f"http://{server}:5000/{path}")
     return response.json()
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

@@ -48,8 +48,20 @@ This Flask application defines a simple web server with two endpoints. The /home
 
 ![image](https://github.com/user-attachments/assets/c25559a6-1555-409a-ba1f-082936e83929)
 
-- Test tha the End Points are working: `http://localhost:5000/home` in the browser.
+- Test the End Points are working: `http://localhost:5000/home` in the browser.
 ![image](https://github.com/user-attachments/assets/1be52dc1-422f-400f-8c9e-302e6796ea40)
+
+### Flow of commands in Docker without CLI
+
+- BUILD THE DOCKER IMAGE  `docker build -t simple-server .`
+
+- TO VIEW THE IMAGES  - `docker images`
+
+- RUN THE DOCKER CONTAINER  -  `docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server`
+
+- CONFIRM ITS RUNNING - `docker ps`
+
+- TEST THE END POINT - `http://localhost:5000/home` on the browser.
 
 
 ### Task 2: Consistent Hashing
@@ -61,13 +73,21 @@ The ConsistentHashing class implements a consistent hashing mechanism to distrib
 
   ![image](https://github.com/user-attachments/assets/506102f5-fc3a-4453-9209-6bd183265eda)
 
-- Confirm that the endpoint are being directed to diferent server by running `http://localhost:5000/home`. The message shows from what server the request is coming from.
+- Confirm that through the endpoint. `http://172.27.0.5:5000/rep`
   
-![image](https://github.com/user-attachments/assets/08c9305a-dcad-41f6-9430-1a9c00555a8e)
+![alt text](image.png)
 
 -Confirm in the Docker App
 
 ![image](https://github.com/user-attachments/assets/fe5d6575-f9e3-4672-933f-5af443c3ed53)
+
+#### Flow of commands
+
+- BUILD UP 3 CONTAINERS FOR THE SERVER  `docker-compose up --scale server=3`
+
+- CONFIRM ITS RUNNING - `docker-compose ps`
+
+- TESTING ON BROWSER: `http://172.27.0.5:5000/rep`
 
   
 ### Task 3: Load Balancer
@@ -76,29 +96,16 @@ This Flask-based load balancer uses consistent hashing to distribute incoming re
 
 #### Testing Procedure:
 
-- Build and deploy the load balancer container: `docker-compose build `
-  
-![image](https://github.com/user-attachments/assets/1cfbe450-fd70-448c-84e4-e53db527b04b)
 
-- Restart the Container: `docker-compose up`
+- Send HTTP requests to load balancer endpoints (/rep, /add, /rm, etc.):  
 
-![image](https://github.com/user-attachments/assets/b2d13444-b459-4b3e-9591-28f0f9288e69)
+For /add, the command add 2 more servers, 4 and 5: `curl -X POST -H "Content-Type: application/json" -d '{"n": 2, "hostnames": ["S5", "S4"]}' http://172.27.0.5:5000/add`
 
-![image](https://github.com/user-attachments/assets/d9536ddb-572e-4aff-b9b2-f0803103b58f)
+![alt text](image-1.png)
 
-- Send HTTP requests to load balancer endpoints (/rep, /add, /rm, etc.): `curl localhost:5000/rep and curl -X POST -d '{"n": 2, "hostnames": ["S5", "S4"]}' localhost:5000/add`
-- 
-- This is a sample of `curl localhost:5000/rep` and verify that the load balancer routes requests to server replicas as expected.
+ - To remove server 5 use ` curl -X DELETE -H "Content-Type: application/json" -d '{"n": 2, "hostnames": ["S5"]}' http://172.27.0.5:5000/rm`
 
- ![image](https://github.com/user-attachments/assets/ced26660-d647-47c9-86ae-4be1b71f1408)
-
- - Add a more servers: 4 and 5. ` curl -X POST -d '{"n": 2, "hostnames": ["S5", "S4"]}' localhost:5000/add` OR `$headers = @{"Content-Type" = "application/json"} $data = '{"n": 2, "hostnames": ["Server 4", "Server 5"]}' `Invoke-WebRequest -Uri http://localhost:5000/add -Method POST -Headers $headers -Body $data`
-   
- ![image](https://github.com/user-attachments/assets/c3c0c4e3-061c-4d6d-b414-4b415eb7c38a)
-
-- To remove server 5 use `curl -X POST -d '{"n": 2, "hostnames": ["S5"]}` OR' localhost:5000/rm `$headers = @{"Content-Type" = "application/json"}  $data = '{"n": 1, "hostnames": ["Server 5"]}` `Invoke-WebRequest -Uri http://localhost:5000/rm -Method DELETE -Headers $headers -Body $data`
-
-![image](https://github.com/user-attachments/assets/6b4a256c-17ba-4fa7-a571-f4c6012dc7fe)
+![alt text](image-2.png)
 
 
   

@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy requirements and app code
 COPY requirements.txt .
-COPY LoadBalancer.py .
+COPY load_balancer.py .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # Command to run the load balancer
-CMD ["python", "LoadBalancer.py"]
+CMD ["python", "load_balancer.py"]
