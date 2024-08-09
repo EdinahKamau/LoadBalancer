@@ -97,24 +97,23 @@ For /add, the command add 2 more servers, 4 and 5: `curl -X POST -H "Content-Typ
 Task 4 involves testing and analyzing the performance of the load balancer implementation in various scenarios. We conduct experiments to evaluate load distribution among server containers and the system's ability to recover from server failures promptly.
 
 ##### A-1: Launch 10,000 Asynchronous Requests on 3 Server Containers
-- Run the A1.py
+- Run the A1.py.
 
 ![image](https://github.com/user-attachments/assets/f1509574-09de-4937-9d8e-472de83014e9)
 
 ##### A-2: Launch 10,000 Asynchronous Requests on 6 Server Containers
-- Run the A2.py after increasing the number of servers to 6
+- Run the A2.py to increase the number of server to 3 and redestribute the requests
 
 ![image](https://github.com/user-attachments/assets/1eede263-3ae7-4343-865c-8453a2a50fc4)
 
+![image](https://github.com/user-attachments/assets/53f36f19-7d21-47cc-beb1-45cfc0c5e24c)
 
 ##### A-3 Test all endpoints of the load balancer 
 - Stop and remove the server1 using `docker stop server1 $$ docker rm server1`
 
 ![image](https://github.com/user-attachments/assets/5b740a7c-5e0d-461b-900f-8cb1c252328f)
 
-- Run the A3.py again.
-
-- The requests which were on server 1 were redestributed to the rest of the servers but it took roughly 5 minutes to adjust.
+- The requests which were on server 1 were redestributed to the rest of the servers.
 
 ##### A-4: Modify Hash Functions
 
