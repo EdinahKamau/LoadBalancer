@@ -101,20 +101,18 @@ Task 4 involves testing and analyzing the performance of the load balancer imple
 
 ![image](https://github.com/user-attachments/assets/f1509574-09de-4937-9d8e-472de83014e9)
 
-- The bar graph illustrates the distribution of requests across three servers: Server1, Server2, and Server3. Server1 has handled the most requests, followed by Server3, while Server2 has handled significantly fewer requests.
+###### Analysis
+- Imbalance in Request Distribution: The graph reveals an imbalance in how requests are distributed among the servers, with Server1 shouldering most of the workload while Server2 is underutilized. This could lead to potential performance issues if Server1 becomes overloaded, while resources on Server2 remain idle.
 
 ##### A-2: Launch 10,000 Asynchronous Requests on 6 Server Containers
 - Run the A2.py to increase the number of server to 3 and redestribute the requests
 
 ![image](https://github.com/user-attachments/assets/53f36f19-7d21-47cc-beb1-45cfc0c5e24c)
 
-The line graph shows the average load across multiple servers (Server1 through Server6) over a series of 10 runs. The y-axis represents the average load, while the x-axis indicates the run number. Each line corresponds to a different server, with varying colors to distinguish them.
-  - Server6 (purple) and Server4 (green) exhibit the most fluctuation in load, with significant spikes and drops across the runs.
-  - Server1 (brown) and Server3 (orange) have relatively stable loads, with some variations but generally lower values compared to other servers.
-  - Server5 (blue) maintains a more consistent load throughout the runs, with minor fluctuations.
-  - Server2 (red) consistently shows a low load across all runs, indicating it was less utilized.
+###### Analysis
+- Uneven Load Distribution: The graph clearly shows an uneven distribution of load across the servers, with some servers experiencing high and fluctuating loads while others are underutilized. This disparity may point to issues with the current load-balancing algorithm, which may not be effectively distributing the workload across all servers. The goal of load balancing is to ensure that no single server is overwhelmed while others remain idle, so an imbalance like this can lead to inefficiencies and potential performance bottlenecks.
 
-Overall, this graph indicates that load distribution across the servers is uneven and varies considerably from one run to the next. Some servers experience high loads at certain points, while others remain underutilized. This could be indicative of an unbalanced load-balancing algorithm or other factors affecting server utilization.
+- Potential Bottlenecks and Inefficiencies: Servers with high fluctuations (like Server6 and Server4) might become potential bottlenecks if their load spikes coincide with high demand periods. On the other hand, underutilized servers (like Server2) represent a wasted resource that could be better utilized to improve overall system efficiency.
 
 ##### A-3 Test all endpoints of the load balancer 
 - Stop and remove the server1 using `docker stop server1 $$ docker rm server1`
