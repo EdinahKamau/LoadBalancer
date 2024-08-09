@@ -39,29 +39,22 @@ This Flask application defines a simple web server with two endpoints. The /home
 
 - Create the Docker Image : `docker build -t simple-server .`
 
-  ![image](https://github.com/user-attachments/assets/d9de6bb3-a917-468f-99bf-6e805156f845)
-  
-- Run the Docker  ` docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server`
+- Run a Docker container named simple-server-instance, maps port 5000 on the host to port 5000 in the container, sets an environment variable SERVER_ID to "1", and uses the image simple-server.
+ ` docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server`
 
 ![image](https://github.com/user-attachments/assets/30142404-db07-44ef-b54d-f8b467bd6e8a)
 
-
-![image](https://github.com/user-attachments/assets/c25559a6-1555-409a-ba1f-082936e83929)
-
 - Test the End Points are working: `http://localhost:5000/home` in the browser.
+
 ![image](https://github.com/user-attachments/assets/1be52dc1-422f-400f-8c9e-302e6796ea40)
 
 ### Flow of commands in Docker without CLI
 
-- BUILD THE DOCKER IMAGE  `docker build -t simple-server .`
-
-- TO VIEW THE IMAGES  - `docker images`
-
-- RUN THE DOCKER CONTAINER  -  `docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server`
-
-- CONFIRM ITS RUNNING - `docker ps`
-
-- TEST THE END POINT - `http://localhost:5000/home` on the browser.
+- Build the docker image: `docker build -t simple-server .`
+- Confirm that the image is created:  `docker images`
+- Run the docker container: `docker run -p 5000:5000 --name simple-server-instance -e SERVER_ID="1" simple-server`
+- Confirm the docker container is running:  `docker ps`
+- Test the end point on the browser: `http://localhost:5000/home`
 
 
 ### Task 2: Consistent Hashing
@@ -69,25 +62,19 @@ The ConsistentHashing class implements a consistent hashing mechanism to distrib
 
 #### Testing Procedure:
 
-- Create 3 docker containers(server) by using this: `docker-compose up --scale server=3`
+- Starts the service defined in the docker-compose.yml file and scale the service named server to run 3 instances (or replicas) of it:  `docker-compose up --scale server=3`
 
   ![image](https://github.com/user-attachments/assets/506102f5-fc3a-4453-9209-6bd183265eda)
 
-- Confirm that through the endpoint. `http://172.27.0.5:5000/rep`
-  
-![alt text](image.png)
+- Confirm that through the endpoint. `curl http://172.27.0.5:5000/rep`
 
--Confirm in the Docker App
-
-![image](https://github.com/user-attachments/assets/fe5d6575-f9e3-4672-933f-5af443c3ed53)
+![image](https://github.com/user-attachments/assets/e5f4472b-3d0e-468e-ad80-a3a504cf218b)
 
 #### Flow of commands
 
-- BUILD UP 3 CONTAINERS FOR THE SERVER  `docker-compose up --scale server=3`
-
-- CONFIRM ITS RUNNING - `docker-compose ps`
-
-- TESTING ON BROWSER: `http://172.27.0.5:5000/rep`
+-  Scale the service named server to run 3 instance:   `docker-compose up --scale server=3`
+-  Confirm they are running: `docker-compose ps`
+-  Test the endpoint on the browser: `curl http://172.27.0.5:5000/rep`
 
   
 ### Task 3: Load Balancer
@@ -95,8 +82,6 @@ This Flask-based load balancer uses consistent hashing to distribute incoming re
 
 
 #### Testing Procedure:
-
-
 - Send HTTP requests to load balancer endpoints (/rep, /add, /rm, etc.):  
 
 For /add, the command add 2 more servers, 4 and 5: `curl -X POST -H "Content-Type: application/json" -d '{"n": 2, "hostnames": ["S5", "S4"]}' http://172.27.0.5:5000/add`
@@ -107,38 +92,36 @@ For /add, the command add 2 more servers, 4 and 5: `curl -X POST -H "Content-Typ
 
 ![alt text](image-2.png)
 
-
   
 ### Task 4: Analysis
 Task 4 involves testing and analyzing the performance of the load balancer implementation in various scenarios. We conduct experiments to evaluate load distribution among server containers and the system's ability to recover from server failures promptly.
 
-#### Testing Procedure:
-- First build up the docker containers again ` docker-compose build`
-
-![image](https://github.com/user-attachments/assets/76a7e8e0-e704-4970-a1c1-608f6dd936d6)
-
 ##### A-1: Launch 10,000 Asynchronous Requests on 3 Server Containers
-- Run the test_script1.py
+- Run the A1.py
 
-![image](https://github.com/user-attachments/assets/2cebb1b6-23a0-40a2-ae11-f088eac84923)
+![image](https://github.com/user-attachments/assets/f1509574-09de-4937-9d8e-472de83014e9)
 
 ##### A-2: Launch 10,000 Asynchronous Requests on 6 Server Containers
-- Run the test_script2.py after increasing the number of servers to 6
+- Run the A2.py after increasing the number of servers to 6
 
-![image](https://github.com/user-attachments/assets/c38f550c-80b8-4ef4-b2e3-7fd7dd0b2701)
+![image](https://github.com/user-attachments/assets/1eede263-3ae7-4343-865c-8453a2a50fc4)
+
 
 ##### A-3 Test all endpoints of the load balancer 
-- Stop the server first using `docker stop <SERVER_ID>`. Any server. Example: `docker stop Server 1`
+- Stop and remove the server1 using `docker stop server1 $$ docker rm server1`
 
-- Run the test_script2.py again.
+![image](https://github.com/user-attachments/assets/5b740a7c-5e0d-461b-900f-8cb1c252328f)
 
-![image](https://github.com/user-attachments/assets/5b49a58c-af90-4c97-896e-70559347921e)
+- Run the A3.py again.
 
 - The requests which were on server 1 were redestributed to the rest of the servers but it took roughly 5 minutes to adjust.
 
 ##### A-4: Modify Hash Functions
 
 After modifying the hash functions used in our load balancer, we observed significant changes in how requests were distributed among server instances. The adjustments led to a noticeable shift in load balancing effectiveness, with some servers handling more requests than previously, while others received fewer. This variability directly impacted the overall efficiency of our load balancer in evenly distributing the workload across all servers. The quality of the new hash functions played a crucial role here: well-designed functions helped maintain stable performance even when servers were added or removed, whereas less effective functions struggled to balance the load consistently. These observations underscore the importance of choosing and refining hash functions carefully to optimize load balancing efficiency and maintain system stability under varying operational conditions.  
+
+
+![image](https://github.com/user-attachments/assets/dd7616ed-22de-4910-a275-87d2bb7d6da6)
 
 
 ### Deployment Instruction
