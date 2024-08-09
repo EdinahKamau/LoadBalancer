@@ -101,26 +101,38 @@ Task 4 involves testing and analyzing the performance of the load balancer imple
 
 ![image](https://github.com/user-attachments/assets/f1509574-09de-4937-9d8e-472de83014e9)
 
+- The bar graph illustrates the distribution of requests across three servers: Server1, Server2, and Server3. Server1 has handled the most requests, followed by Server3, while Server2 has handled significantly fewer requests.
+
 ##### A-2: Launch 10,000 Asynchronous Requests on 6 Server Containers
 - Run the A2.py to increase the number of server to 3 and redestribute the requests
 
-![image](https://github.com/user-attachments/assets/1eede263-3ae7-4343-865c-8453a2a50fc4)
-
 ![image](https://github.com/user-attachments/assets/53f36f19-7d21-47cc-beb1-45cfc0c5e24c)
+
+The line graph shows the average load across multiple servers (Server1 through Server6) over a series of 10 runs. The y-axis represents the average load, while the x-axis indicates the run number. Each line corresponds to a different server, with varying colors to distinguish them.
+  - Server6 (purple) and Server4 (green) exhibit the most fluctuation in load, with significant spikes and drops across the runs.
+  - Server1 (brown) and Server3 (orange) have relatively stable loads, with some variations but generally lower values compared to other servers.
+  - Server5 (blue) maintains a more consistent load throughout the runs, with minor fluctuations.
+  - Server2 (red) consistently shows a low load across all runs, indicating it was less utilized.
+
+Overall, this graph indicates that load distribution across the servers is uneven and varies considerably from one run to the next. Some servers experience high loads at certain points, while others remain underutilized. This could be indicative of an unbalanced load-balancing algorithm or other factors affecting server utilization.
 
 ##### A-3 Test all endpoints of the load balancer 
 - Stop and remove the server1 using `docker stop server1 $$ docker rm server1`
 
 ![image](https://github.com/user-attachments/assets/5b740a7c-5e0d-461b-900f-8cb1c252328f)
 
-- The requests which were on server 1 were redestributed to the rest of the servers.
 
 ##### A-4: Modify Hash Functions
 
 After modifying the hash functions used in our load balancer, we observed significant changes in how requests were distributed among server instances. The adjustments led to a noticeable shift in load balancing effectiveness, with some servers handling more requests than previously, while others received fewer. This variability directly impacted the overall efficiency of our load balancer in evenly distributing the workload across all servers. The quality of the new hash functions played a crucial role here: well-designed functions helped maintain stable performance even when servers were added or removed, whereas less effective functions struggled to balance the load consistently. These observations underscore the importance of choosing and refining hash functions carefully to optimize load balancing efficiency and maintain system stability under varying operational conditions.  
 
+![image](https://github.com/user-attachments/assets/37d62d66-2fba-4649-a575-8fc115e71cc2)
+
+The first chart is a bar chart titled "Request Distribution Across Servers." It shows the number of requests handled by six different servers (Server1 through Server6). Server2 and Server3 have handled the most requests, each with a count of around 2,500, indicating they are likely the primary servers handling the load. Server4 also handles a significant number of requests, though less than Server2 and Server3. The remaining servers (Server1, Server5, and Server6) handle fewer requests, with Server1 and Server5 having the lowest numbers, indicating they may be used as backup servers or for less critical tasks.
 
 ![image](https://github.com/user-attachments/assets/dd7616ed-22de-4910-a275-87d2bb7d6da6)
+
+The second chart is a line graph titled "Average Load of Servers Over Multiple Runs." It tracks the average load on each server across ten different runs. The graph shows significant variability in the load distribution across different servers and runs. Server3 consistently experiences the highest average load, staying around 0.5 across the runs, indicating it is heavily utilized or central to the operations. The other servers (Server1, Server2, Server4, Server5, and Server6) show lower and more fluctuating loads, suggesting they handle more variable or less consistent tasks. This chart highlights the dynamic nature of load distribution among the servers.
 
 
 ### Deployment Instruction
