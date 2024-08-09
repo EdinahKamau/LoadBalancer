@@ -1,4 +1,4 @@
-BUILD THE DOCKER IMAGE -  `docker build -t simple-server .`
+BUILD THE DOCKER IMAGES-  `docker-compose build`
 
 TO VIEW THE IMAGES  -  `docker images`
 
@@ -11,7 +11,7 @@ TEST THE END POINT - `http://localhost:5000/home`
 
 TASK 2: CONSISTENT HASHING
 
-BUILD UP 3 CONTAINERS FOR THE SERVER  `docker-compose up --scale server=3`
+BUILD THE LOAD BALANCER - `docker-compose up load_balancer`
 
 CONFIRM ITS RUNNING - `docker-compose ps`
 
@@ -27,6 +27,12 @@ TO DELETE `curl -X DELETE -H "Content-Type: application/json" -d '{"n": 2, "host
 
 TASK 3:ANALYSIS
 
+TEST A1: 'python3 A1.py'
+TEST A2: 'python3 A2.py'
+TEST A3: 
+    check servers: 'docker ps'|'curl http://172.27.0.5:5000/rep'
+    stop one server eg: 'docker stop Server1 && docker rm Server 1'
+    periodically check servers again: 'docker ps'|'curl http://172.27.0.5:5000/rep'
 
 
 

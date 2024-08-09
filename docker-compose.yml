@@ -5,15 +5,27 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.load_balancer
+    image: load_balancer_image
     ports:
       - "5000:5000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
     depends_on:
       - server
+    networks:
+      - custom_network
 
   server:
     build:
       context: .
       dockerfile: Dockerfile
+    image: app_server
     environment:
       - SERVER_ID=Server
+    networks:
+      - custom_network
 
+networks:
+  custom_network:
+    driver: bridge

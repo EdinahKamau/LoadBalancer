@@ -4,9 +4,22 @@ FROM python:3.8-slim
 # Set working directory in the container
 WORKDIR /app
 
+# Install Docker client
+RUN apt-get update && \
+    apt-get install -y docker.io
+    
+# Install docker-compose
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" \
+    -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
+
 # Copy requirements and app code
 COPY requirements.txt .
 COPY load_balancer.py .
+COPY consistentHashing.py .
+
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
